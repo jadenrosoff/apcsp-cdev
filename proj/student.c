@@ -7,7 +7,7 @@
 #include <string.h>
 
 #include "student.h"
-#include "encrypt.h"
+#include "encrypt/encrypt.h"
 
 
 const char* STUFILE = "studentdata.txt";
@@ -25,12 +25,20 @@ void createStudent(char* fname, char* lname, int age, int id)
   // student to the student array
   //  - the firstName and lastName strings should be dynamically created
   //    based on the size of the fname and lname args
+  Student* student = (Student*)malloc(sizeof(Student));
+  strcpy(student->firstName, fname);
+  strcpy(student->lastName, lname);
+  student->age = age;
+  student->id = id;
+  students[numStudents] = student;
+  numStudents++;
 }
 
 
 void deleteStudent(Student* student)
 {
   // free the memory associated with a student including the strings
+  free(student);
 }
 
 
@@ -38,6 +46,12 @@ void deleteStudents()
 {
   // iterate over the students array deleting every student and setting te pointer
   // values to 0 and adjusting the numStudents to 0
+  for (int i = 0; i < numStudents; i++)
+  {
+    deleteStudent(students[i]);
+    students[i] = 0;
+  }
+  numStudents = 0;
 }
 
 
@@ -54,17 +68,21 @@ void saveStudents(int key)
   fp = fopen(STUFILE, "rw");
   if (fp)
   {
-    for (int i = 0; i < numStudents, i++)
+    for (int i = 0; i < numStudents; i++)
     {
 //strcpy parts of students into string
-      char * line[256] = students[i]->firstName, students[i]->lastName, students[i]->age, students[i]->id;
+      char line[256];
       strcpy(line, students[i]->firstName);
       strcat(line, students[i]->lastName);
-      strcat(line, students[i]->age);
-      strcat(line, students[i]->id);
+      char sage[5];
+      sprintf(sage, "%d", students[i]->age);
+      strcat(line, sage);
+      char sid[10];
+      sprintf(sid, "%ld", students[i]->id);
+      strcat(line, sid);
 //opposite of load
       caesarDecrypt(line, key);
-      fprint("%s", line);
+      fprintf(fp, "%s", line);
     }
   }
   fclose(fp);

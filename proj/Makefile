@@ -1,23 +1,27 @@
 TARGET = studentproj
-LIBS = -lm -lenc
 CC = gcc
-CFLAGS = -g -Wall -I. -Iencrypt
-LDFLAGS = -Lencrypt
+CFLAGS = -g -Wall -O3
 
 .PHONY: clean all default
 
 default: $(TARGET)
 all: default
 
-HEADERS = encrypt.h
+HEADERS = encrypt/encrypt.h
 OBJECTS = studentmain.o student.o
 
-%.o: %.c $(HEADERS)
-	$(CC) $(CFLAGS) -c $< -o $@
+$(TARGET): studentmain.o student.o encrypt.o
+	$(CC) -o $(TARGET) studentmain.o student.o encrypt.o
 
-$(TARGET): $(OBJECTS)
-	$(CC) $^ $(LIBS) $(LDFLAGS) -o $@
+studentmain.o: studentmain.c
+	$(CC) $(CFLAGS) -c studentmain.c
+
+student.o: student.c
+	$(CC) $(CFLAGS) -c student.c
+
+encrypt.o: encrypt/encrypt.c
+	$(CC) $(CFLAGS) -c encrypt/encrypt.c
 
 clean:
-	-rm -f *.o
+	-rm -f *.o a.out
 	-rm -f $(TARGET)
