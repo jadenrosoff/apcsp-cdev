@@ -25,12 +25,14 @@ void createStudent(char* fname, char* lname, int age, int id)
   // student to the student array
   //  - the firstName and lastName strings should be dynamically created
   //    based on the size of the fname and lname args
-  Student* student = (Student*)malloc(sizeof(Student));
-  strcpy(student->firstName, fname);
-  strcpy(student->lastName, lname);
-  student->age = age;
-  student->id = id;
-  students[numStudents] = student;
+  Student* stu = (Student*) malloc(sizeof(Student));
+  stu->firstName = (char*) malloc((strlen(fname) + 1) * sizeof(char));
+  stu->lastName = (char*) malloc((strlen(lname) + 1) * sizeof(char));
+  strcpy(stu->firstName, fname);
+  strcpy(stu->lastName, lname);
+  stu->age = age;
+  stu->id = id;
+  students[numStudents] = stu;
   numStudents++;
 }
 
@@ -38,6 +40,8 @@ void createStudent(char* fname, char* lname, int age, int id)
 void deleteStudent(Student* student)
 {
   // free the memory associated with a student including the strings
+  free(student->firstName);
+  free(student->lastName);
   free(student);
 }
 
@@ -75,15 +79,15 @@ void saveStudents(int key)
       strcpy(line, students[i]->firstName);
       strcat(line, students[i]->lastName);
       char sage[5];
-      sprintf(sage, "%d", students[i]->age);
+      sprintf(sage, " %d", students[i]->age);
       strcat(line, sage);
       char sid[10];
-      sprintf(sid, "%ld", students[i]->id);
+      sprintf(sid, " %ld", students[i]->id);
       strcat(line, sid);
-//opposite of load
-      caesarDecrypt(line, key);
-      fprintf(fp, "%s", line);
+      caesarEncrypt(line, key);
+      printf("saving: %s\n", line);
     }
+    printf("saved %d students", numStudents);
   }
   fclose(fp);
 }
@@ -99,16 +103,18 @@ void loadStudents(int key)
   {
     while (fgets(line, sizeof(line), fp))
     {
-      //might be decrypt
-      caesarEncrypt(line, key);
-      char * fname = strtok(line, " ");
-      char * lname = strtok(NULL, " ");
+      printf("hello");
+      caesarDecrypt(line, key);
+      printf("hello");
+      char* fname = strtok(line, " ");
+      char* lname = strtok(NULL, " ");
       int age = atoi(strtok(NULL, " "));
       int id = atoi(strtok(NULL, " "));
       createStudent(fname, lname, age, id);
     }
   }
   fclose(fp);
+  printf("loaded %d students", numStudents);
 }
 
 
