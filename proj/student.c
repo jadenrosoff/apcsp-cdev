@@ -68,26 +68,21 @@ void saveStudents(int key)
   //       james dean 21 2345 
   //       katy jones 18 4532 
   FILE* fp;
-
-  fp = fopen(STUFILE, "rw");
+  char line[256];
+  fp = fopen(STUFILE, "w");
   if (fp)
   {
     for (int i = 0; i < numStudents; i++)
     {
-//strcpy parts of students into string
-      char line[256];
-      strcpy(line, students[i]->firstName);
-      strcat(line, students[i]->lastName);
-      char sage[5];
-      sprintf(sage, " %d", students[i]->age);
-      strcat(line, sage);
-      char sid[10];
-      sprintf(sid, " %ld", students[i]->id);
-      strcat(line, sid);
-      caesarEncrypt(line, key);
+      sprintf(line, "%s %s %d %ld", students[i]->firstName, students[i]->lastName, students[i]->age, students[i]->id);
+      if (key != 0)
+      {
+        caesarEncrypt(line, key);
+      }
+      fprintf(fp, "%s\n", line);
       printf("saving: %s\n", line);
     }
-    printf("saved %d students", numStudents);
+  printf("saved %d students", numStudents);
   }
   fclose(fp);
 }
@@ -96,16 +91,21 @@ void saveStudents(int key)
 void loadStudents(int key)
 {
   // load the students from the data file overwriting all exisiting students in memory
+  if (numStudents > 0)
+  {
+    deleteStudents();
+  }
   FILE* fp;
   char line[256];
-  fp = fopen(STUFILE, "rw");
+  fp = fopen(STUFILE, "r");
   if (fp)
   {
     while (fgets(line, sizeof(line), fp))
     {
-      printf("hello");
-      caesarDecrypt(line, key);
-      printf("hello");
+      if (key != 0)
+      {
+        caesarDecrypt(line, key);
+      }
       char* fname = strtok(line, " ");
       char* lname = strtok(NULL, " ");
       int age = atoi(strtok(NULL, " "));

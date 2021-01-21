@@ -6,6 +6,10 @@
 
 #include "encrypt.h"
 
+#include <ctype.h>
+
+#include <stdio.h>
+
 
 char CHARS[] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 int CHARS_LEN = 62;
@@ -22,18 +26,35 @@ char shiftChar(char c, int shift, int direction)
   //   shiftChar('c', 3, 1) : 'f'
   //   shiftChar('S', 2, 0) : 'P'
   //   shiftChar('b', 3, 0) : '8'
-  if (c == ' ' || c == '\t' || c == '\n' || c == '\r' || c == '\0')
+  if (isspace(c))
   {
     return c;
   }
-  int index = c - 97;
-  if (direction)
+  int index;
+  if (islower(c))
   {
-    return CHARS[index + shift];
+    index = c - 'a';
+  }
+  else if (isupper(c))
+  {
+    index = c - 'A' + 26;
+  }
+  else if (isdigit(c))
+  {
+    index = c - '0' + 52;
   }
   else
   {
-    return CHARS[index - shift];
+    printf("not a valid response");
+    return c;
+  }
+  if (direction)
+  {
+    return CHARS[(index + shift) %CHARS_LEN];
+  }
+  else
+  {
+    return CHARS[(index - shift) %CHARS_LEN];
   }
 }
 
